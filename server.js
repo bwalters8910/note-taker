@@ -2,6 +2,7 @@
 const express = require("express");
 const path = require("path");
 
+
 // Sets up the Express App
 const app = express();
 const PORT = 3000;
@@ -9,6 +10,19 @@ const PORT = 3000;
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// test database to get post working
+
+let notes = [
+  {
+    title: "Test Title",
+    text: "Test text",
+  },
+  {
+    title: "Test TitleTwo",
+    text: "Test textTwo",
+  },
+];
 
 
 // Routes
@@ -21,6 +35,14 @@ app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "develop/publi
 
 // Displays all notes
 app.get("/api/notes", (req, res) => res.sendFile(path.join(__dirname, "develop/db/db.json")));
+
+// saves new note to test database not JSON file
+app.post("/api/notes", (req, res) => {
+  const newNote = req.body;
+  newNote.routeName = newNote.title.replace(/\s+/g, "").toLowerCase();
+  notes.push(newNote);
+  res.json(newNote);
+});
 
 // Starts the server to begin listening
 app.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
