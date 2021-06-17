@@ -1,48 +1,41 @@
 // Dependencies
 const express = require("express");
 const path = require("path");
-
+const fs = require('fs');
+const util = require("util");
+const writeFileAsync = util.promisify(fs.writeFile);
+const { v4: uuidv4 } = require("uuid");
 
 // Sets up the Express App
 const app = express();
 const PORT = 3000;
 
 // Sets up the Express app to handle data parsing
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// test database to get post working
-
-let notes = [
-  {
-    title: "Test Title",
-    text: "Test text",
-  },
-  {
-    title: "Test TitleTwo",
-    text: "Test textTwo",
-  },
-];
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Routes
 
-// route that gets user to homepage
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "develop/public/index.html")));
-
 // route that gets user to the notes page
-app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "develop/public/notes.html")));
+app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "public/notes.html")));
 
 // Displays all notes
-app.get("/api/notes", (req, res) => res.sendFile(path.join(__dirname, "develop/db/db.json")));
+// read file async
+app.get("/api/notes", (req, res) => res.sendFile(path.join(__dirname, "db/db.json")));
 
 // saves new note to test database not JSON file
 app.post("/api/notes", (req, res) => {
-  const newNote = req.body;
-  newNote.routeName = newNote.title.replace(/\s+/g, "").toLowerCase();
-  notes.push(newNote);
-  res.json(newNote);
+    const newNote = req.body;
+    newNote.id = uuidv4();
+    newNote.routeName = newNote.title.replace(/\s+/g, "").toLowerCase();
+    notes.push(newNote);
+    writeFileAsync(path.join(__dirname, "db/db.json"), JSON.stringify(notes));
+    res.json(newNote);
 });
+
+// route that gets user to homepage
+app.get("*", (req, res) => res.sendFile(path.join(__dirname, "public/index.html")));
 
 // Starts the server to begin listening
 app.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
