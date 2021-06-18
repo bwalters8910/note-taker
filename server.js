@@ -15,6 +15,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// testing database
+
+let notes = [];
+
 // Routes
 
 // route that gets user to the notes page
@@ -28,10 +32,21 @@ app.get("/api/notes", (req, res) => res.sendFile(path.join(__dirname, "db/db.jso
 app.post("/api/notes", (req, res) => {
     const newNote = req.body;
     newNote.id = uuidv4();
-    newNote.routeName = newNote.title.replace(/\s+/g, "").toLowerCase();
     notes.push(newNote);
     writeFileAsync(path.join(__dirname, "db/db.json"), JSON.stringify(notes));
     res.json(newNote);
+});
+
+// delete route
+app.delete("/api/notes/:id", (req, res) => {
+    fs.readFile("./db/db.json", (err, data) => {
+        if (err) throw err;
+        const noteArray = data.filter((note) => note.id !== req.params.id);
+        fs.writeFile("./db/db.json", JSON.stringify(noteArray), err => {
+            if (err) throw err;
+            res.json(data)
+    })
+    })
 });
 
 // route that gets user to homepage
