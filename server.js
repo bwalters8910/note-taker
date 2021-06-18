@@ -6,6 +6,7 @@ const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
 const { v4: uuidv4 } = require("uuid");
 
+
 // Sets up the Express App
 const app = express();
 const PORT = 3000;
@@ -14,8 +15,6 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
-// testing database
 
 let notes = [];
 
@@ -39,15 +38,11 @@ app.post("/api/notes", (req, res) => {
 
 // delete route
 app.delete("/api/notes/:id", (req, res) => {
-    fs.readFile("./db/db.json", (err, data) => {
-        if (err) throw err;
-        const noteArray = data.filter((note) => note.id !== req.params.id);
-        fs.writeFile("./db/db.json", JSON.stringify(noteArray), err => {
-            if (err) throw err;
-            res.json(data)
-    })
-    })
+    notes = notes.filter((note) => note.id !== req.params.id);
+    writeFileAsync(path.join(__dirname, "db/db.json"), JSON.stringify(notes));
+    res.sendStatus(200);
 });
+
 
 // route that gets user to homepage
 app.get("*", (req, res) => res.sendFile(path.join(__dirname, "public/index.html")));
