@@ -18,6 +18,10 @@ Here is the link to the Github repository where the repo can be cloned (https://
 
 To use this app, sipmly type in a note title, note body, then click the save button.
 
+![screenshot1](public/assets/images/screenshot1.PNG)
+![screenshot2](public/assets/images/screenshot2.PNG)
+
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
